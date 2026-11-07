@@ -99,7 +99,7 @@ const maskTex = (() => {
   g.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return t;
 })();
 const artTex = new THREE.Texture(artImg); artTex.colorSpace = THREE.SRGBColorSpace; artTex.anisotropy = 8; artTex.needsUpdate = true;
-const dirtMul = new THREE.Color(0.30, 0.26, 0.2), white = new THREE.Color(1, 1, 1);
+const dirtMul = new THREE.Color(0.62, 0.55, 0.46), white = new THREE.Color(1, 1, 1);
 const baseMat = new THREE.MeshBasicMaterial({ map: artTex, transparent: true, toneMapped: false, depthWrite: false, color: dirtMul.clone() });
 const planeGeo = new THREE.PlaneGeometry(LW, LH);
 const addPlane = (mat, dz, extra = {}) => { const m = new THREE.Mesh(planeGeo, mat); m.position.z = FRONT + dz; Object.assign(m, extra); logo.add(m); return m; };
@@ -115,14 +115,20 @@ shadowCatcher.position.z = FRONT + 0.03; shadowCatcher.receiveShadow = true; log
 /* paint grime + haze */
 (function paint() {
   const g = grime.x;
-  g.fillStyle = "rgba(76,62,46,.9)"; g.fillRect(0, 0, TW, TH);
-  for (let i = 0; i < 700; i++) {
-    const x = rr(0, TW), y = rr(0, TH), r = rr(4, 38), c = rnd() < 0.5 ? "40,30,20" : rnd() < 0.5 ? "104,86,62" : "126,126,122";
-    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${c},${rr(0.25, 0.65)})`); gr.addColorStop(1, `rgba(${c},0)`);
+  // 1) thin dusty film (the silver / gold still shows through)
+  g.fillStyle = "rgba(92,78,60,.46)"; g.fillRect(0, 0, TW, TH);
+  for (let i = 0; i < 520; i++) {
+    const x = rr(0, TW), y = rr(0, TH), r = rr(10, 70), c = rnd() < 0.55 ? "70,56,40" : rnd() < 0.5 ? "120,104,80" : "40,32,24";
+    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${c},${rr(0.1, 0.32)})`); gr.addColorStop(1, `rgba(${c},0)`);
     g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
   }
-  for (let i = 0; i < 110; i++) { const x = rr(0, TW), y = rr(0, TH * 0.6), l = rr(0.15, 0.6) * TH; g.strokeStyle = `rgba(28,20,12,${rr(0.15, 0.45)})`; g.lineWidth = rr(1, 4); g.beginPath(); g.moveTo(x, y); g.lineTo(x + rr(-4, 4), y + l); g.stroke(); }
-  for (let i = 0; i < 1400; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? "20,16,12" : "160,150,130"},${rr(0.2, 0.7)})`; g.fillRect(rr(0, TW), rr(0, TH), rr(1, 3), rr(1, 3)); }
+  // 2) road-spray: dense speckles, heavier toward the bottom
+  for (let i = 0; i < 5200; i++) { const y = Math.pow(rnd(), 0.65) * TH; g.fillStyle = `rgba(${rnd() < 0.7 ? "46,36,26" : "150,136,112"},${rr(0.35, 0.9)})`; g.beginPath(); g.arc(rr(0, TW), y, rr(0.6, 2.6), 0, 7); g.fill(); }
+  // 3) mud splats
+  for (let i = 0; i < 70; i++) { const x = rr(0, TW), y = rr(0, TH), r = rr(3, 11); g.fillStyle = `rgba(48,36,24,${rr(0.55, 0.9)})`; g.beginPath(); g.ellipse(x, y, r, r * rr(0.7, 1.2), rr(0, 3), 0, 7); g.fill();
+    for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + rr(-r * 2, r * 2), y + rr(-r * 2, r * 2), rr(0.8, 2.2), 0, 7); g.fill(); } }
+  // 4) drip streaks running down
+  for (let i = 0; i < 95; i++) { const x = rr(0, TW), y = rr(0, TH * 0.65), l = rr(0.12, 0.6) * TH, gr = g.createLinearGradient(0, y, 0, y + l); gr.addColorStop(0, `rgba(44,34,24,${rr(0.3, 0.6)})`); gr.addColorStop(1, "rgba(44,34,24,0)"); g.strokeStyle = gr; g.lineWidth = rr(1.2, 4.5); g.lineCap = "round"; g.beginPath(); g.moveTo(x, y); g.lineTo(x + rr(-3, 3), y + l); g.stroke(); }
   grime.t.needsUpdate = true;
   const h = haze.x;
   h.fillStyle = "rgba(206,206,212,.52)"; h.fillRect(0, 0, TW, TH);
