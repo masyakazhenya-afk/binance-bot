@@ -1,0 +1,3 @@
+{ "name": "sm-intro3d", "private": true, "type": "module",
+  "scripts": { "build": "esbuild intro3d.src.js --bundle --minify --format=esm --outfile=../sm-scheinwerfer/js/intro3d.js" },
+  "dependencies": { "three": "0.187.0" }, "devDependencies": { "esbuild": "*" } }
