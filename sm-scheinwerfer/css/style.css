@@ -238,3 +238,5 @@ header{transition:opacity 1s .2s,background .3s,padding .3s}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
 .card{min-width:0}.card .btn{max-width:100%}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.btn svg[stroke]{fill:none;stroke:currentColor}
+.btn svg[stroke] circle[fill]{fill:currentColor;stroke:none}
