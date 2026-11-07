@@ -10,7 +10,7 @@
   const skip = document.getElementById("introSkip");
   const ctx = cv.getContext("2d");
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const RATE = 1.12;                     // playback speed
+  const RATE = 2.2;                      // playback speed
   const ASPECT = 1294 / 392;             // SM crop ratio
   const mk = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); x.scale(DPR, DPR); return [c, x]; };
 
@@ -158,7 +158,7 @@
     if (t >= S.foam[0] && t <= S.foam[1] + .1) {
       const q = Math.min(pf, 1), row = q < .5 ? .3 : .7, u = (q % .5) / .5;
       const x = lx - 20 + (lw + 40) * (q < .5 ? u : 1 - u), y = ly + lh * row;
-      foamAt(x, y, 16, lh * .3);
+      foamAt(x, y, 28, lh * .3);
       this_nozzle = [x, y];
     } else this_nozzle = null;
 
@@ -167,7 +167,7 @@
     if (t >= S.scrub[0] && t <= S.scrub[1]) {
       const f = p => [lx + lw * (-.05 + 1.1 * tri(p * 3.5)), ly + lh * (.2 + .6 * p) + Math.sin(p * 60) * lh * .06];
       const [a, b] = pos("sp", ps, f); sp = b;
-      erase(0, Dx, a, b, lh * .6); foamAt(b[0], b[1], 7, lh * .3);
+      erase(0, Dx, a, b, lh * .6); foamAt(b[0], b[1], 12, lh * .3);
     }
     // rinse
     let band = null;
