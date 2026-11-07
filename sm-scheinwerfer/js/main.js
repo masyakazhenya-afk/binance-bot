@@ -52,25 +52,3 @@ $$(".ba").forEach(ba => {
   ba.addEventListener("pointermove", e => drag && set(e.clientX));
   ba.addEventListener("pointerup", () => drag = false);
 });
-
-// Booking form -> WhatsApp message
-const form = $("#booking");
-if (form) {
-  const d = $("#datum");
-  if (d) d.min = new Date().toISOString().split("T")[0];
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(form));
-    const msg = [
-      "Hallo SM Scheinwerfer, ich möchte gerne einen Termin buchen.",
-      "",
-      `Name: ${f.name}`,
-      `Fahrzeug: ${f.auto}`,
-      `Leistung: ${f.leistung}`,
-      `Ort / PLZ: ${f.ort}`,
-      `Wunschtermin: ${f.datum || "flexibel"}${f.zeit ? ", " + f.zeit : ""}`,
-      f.nachricht ? `Nachricht: ${f.nachricht}` : ""
-    ].filter(x => x !== null).join("\n");
-    window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
-  });
-}
