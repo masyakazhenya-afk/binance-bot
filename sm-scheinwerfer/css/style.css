@@ -170,7 +170,7 @@ footer .links{display:flex;gap:22px;flex-wrap:wrap}
 .ba-grid .ba{aspect-ratio:1/1;max-width:none}
 .ba img{object-position:var(--pos,50% 50%)}
 .hero-img{aspect-ratio:1/1;max-width:520px;margin-left:auto}
-.hero-bg{background-image:url(../assets/mercedes-after.jpg);background-position:center 30%;opacity:.16}
+.hero-bg{background-image:url(../assets/hero-bg.jpg);background-position:center 30%;opacity:.16}
 @media(max-width:900px){.ba-grid{grid-template-columns:1fr}.hero-img{margin:0 auto;max-width:420px}}
 .menu .mob{display:none}
 @media(max-width:900px){.menu .mob{display:block}}
