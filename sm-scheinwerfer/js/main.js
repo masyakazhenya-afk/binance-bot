@@ -1,3 +1,10 @@
+// Always open pages at the top (unless the link targets a section)
+try { history.scrollRestoration = "manual"; } catch (e) {}
+const toTop = () => { if (!location.hash) window.scrollTo({ top: 0, left: 0, behavior: "instant" }); };
+toTop();
+addEventListener("pageshow", toTop);
+addEventListener("load", () => { toTop(); setTimeout(toTop, 120); });
+
 const WA = "4915567463623";
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
