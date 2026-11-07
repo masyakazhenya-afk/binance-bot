@@ -260,6 +260,12 @@ star.position.set(...px2w(1240, 40), FRONT + 0.1);
 
 [sponge, cloth, polisher, bottle].forEach(o => { o.visible = false; scene.add(o); });
 
+/* the REAL logo: the intro ends by dissolving into the original artwork (exact shapes, no re-drawn geometry) */
+const origTex = new THREE.TextureLoader().load("assets/logo-sm.png"); origTex.colorSpace = THREE.SRGBColorSpace; origTex.anisotropy = 8;
+const ORIG_Z = FRONT + 0.06;
+const orig = new THREE.Mesh(new THREE.PlaneGeometry(LW, LH), new THREE.MeshBasicMaterial({ map: origTex, transparent: true, opacity: 0, toneMapped: false, depthWrite: false }));
+orig.position.z = ORIG_Z; orig.scale.setScalar((camDist - ORIG_Z) / camDist); orig.visible = false; scene.add(orig);
+
 /* ---------- animation ---------- */
 let done = false, t0 = null, tPrev = 0, px = 0, py = 0, sx = 0, sy = 0;
 const prev = {};
@@ -376,6 +382,10 @@ function sim(t, dt) {
   const sk = Math.sin(clamp(seg(S.shine[0] + 0.5, S.shine[1] + 0.6, t)) * Math.PI);
   star.visible = sk > 0.01; star.scale.setScalar(1.4 * sk + 0.01); star.material.rotation = t * 0.6;
 
+  const cf = ease(seg(S.shine[0] + 0.25, S.shine[1] + 0.55, t));                 // dissolve 3D metal -> original artwork
+  orig.visible = cf > 0; orig.material.opacity = cf;
+  letterMats.forEach(m => { m.transparent = true; m.opacity = 1 - cf; });
+  logo.children.forEach(c => { if (c.material && c.material.map) c.visible = cf < 1; });
   if (t >= S.text[0] && !txt.classList.contains("show")) txt.classList.add("show");
   if (t >= S.shine[0]) canvas.classList.add("glow");
 }
@@ -407,5 +417,5 @@ const dbg = new URLSearchParams(location.search).get("introT");     // ?introT=3
 if (dbg !== null) {
   const T = parseFloat(dbg) || 0; let tt = 0;
   while (tt < T) { tt += 0.034; sim(tt, 0.034); }
-  render(T); window.__introReady = true;
+  render(T); setInterval(() => render(T), 150); window.__introReady = true;
 } else requestAnimationFrame(frame);
