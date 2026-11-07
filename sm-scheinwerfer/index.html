@@ -6,7 +6,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script>try{if(!sessionStorage.getItem("sm-intro")&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.classList.add("intro-active")}catch(e){}</script>
 </head><body>
+<div id="intro" aria-hidden="true"><div id="introStage"><canvas id="introCanvas"></canvas><img id="introText" src="assets/logo-text.png" alt=""></div><button id="introSkip" type="button">Überspringen →</button></div>
 <header><div class="wrap nav">
 <a class="brand" href="index.html"><img src="assets/logo-header.jpg" alt="SM Scheinwerfer Service"></a>
 <ul class="menu"><li><a href="#leistungen">Leistungen</a></li><li><a href="#ergebnisse">Vorher / Nachher</a></li><li><a href="#ablauf">Ablauf</a></li><li><a href="ueber-uns.html">Über uns</a></li><li><a href="einsatzgebiet.html">Einsatzgebiet</a></li><li><a href="termin.html">Termin buchen</a></li><li class="mob"><a class="btn btn-gold sm" href="https://wa.me/4915567463623?text=Hallo%20SM%20Scheinwerfer%2C%20ich%20interessiere%20mich%20f%C3%BCr%20eine%20Scheinwerfer-Aufbereitung." target="_blank" rel="noopener">WhatsApp</a></li></ul>
@@ -65,4 +67,5 @@
 <div>WhatsApp: +49 155 67463623<br>© 2026 SM Scheinwerfer</div>
 </div></footer>
 <a class="wa-float" href="https://wa.me/4915567463623?text=Hallo%20SM%20Scheinwerfer%2C%20ich%20interessiere%20mich%20f%C3%BCr%20eine%20Scheinwerfer-Aufbereitung." target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1a14 14 0 0 1-5.6-4.9c-.4-.6-1.4-1.8-1.4-3.4s.8-2.2 1.1-2.6c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.300 2.4 1.500.3.1.5.1.7-.1l.9-1.100c.2-.3.4-.2.7-.1l2 .9c.3.1.5.2.5.4.1.2.1.800-.1 1.500Z"/></svg></a>
-<script src="js/main.js"></script></body></html>
+<script src="js/main.js"></script>
+<script src="js/intro.js"></script></body></html>
