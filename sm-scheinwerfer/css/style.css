@@ -192,27 +192,46 @@ footer .links{display:flex;gap:22px;flex-wrap:wrap}
 header,main,.wa-float{transition:opacity 1s .2s}
 header{transition:opacity 1s .2s,background .3s,padding .3s}
 
-/* 3D animated gallery (hero) */
-.gallery{position:relative;width:min(460px,100%);margin-left:auto;--rx:0deg;--ry:0deg}
-.g-stage{position:relative;aspect-ratio:4/5;perspective:1300px;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease-out}
-.slide{position:absolute;inset:0;margin:0;border-radius:26px;overflow:hidden;border:1px solid rgba(248,184,58,.35);background:#111;
-  transition:transform 1.1s cubic-bezier(.2,.8,.2,1),opacity .9s,filter .9s;opacity:0;transform:translate3d(30%,0,-260px) rotateY(-30deg) scale(.7);pointer-events:none;z-index:0}
-.slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.14);transition:transform 6s linear}
-.slide::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(8,8,8,.0) 55%,rgba(8,8,8,.75)),radial-gradient(120% 80% at 80% 0,rgba(248,184,58,.18),transparent 60%)}
-.slide::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;z-index:3;background:linear-gradient(100deg,transparent,rgba(255,244,214,.55),transparent);transform:skewX(-18deg);opacity:0}
-.slide.is-active{opacity:1;z-index:3;transform:translate3d(0,0,0) rotateY(0) scale(1);box-shadow:0 0 90px -15px rgba(248,184,58,.45),0 30px 60px -20px #000;pointer-events:auto}
-.slide.is-active img{transform:scale(1)}
-.slide.is-active::after{animation:gsweep 1.5s .35s ease-out}
-.slide.is-active.enter{animation:greveal 1.1s cubic-bezier(.2,.8,.2,1)}
-.slide.is-next{opacity:.55;z-index:2;filter:brightness(.55) blur(1.5px);transform:translate3d(16%,0,-140px) rotateY(-22deg) scale(.84)}
-.slide.is-prev{opacity:.0;z-index:1;transform:translate3d(-30%,0,-240px) rotateY(26deg) scale(.7)}
-@keyframes greveal{0%{clip-path:inset(0 0 0 100% round 26px);transform:translate3d(10%,0,-60px) rotateY(-14deg) scale(.92)}100%{clip-path:inset(0 0 0 0 round 26px)}}
-@keyframes gsweep{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}
-.g-ui{display:flex;align-items:center;gap:16px;margin-top:20px;font-size:.85rem;color:var(--muted)}
-.g-count b{color:var(--gold);font-size:1.1rem}
-.g-label{flex:1;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#fff;font-size:.78rem;transition:opacity .4s}
-.g-bar{width:90px;height:2px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
-.g-bar i{display:block;height:100%;width:0;background:var(--gold);box-shadow:0 0 10px var(--gold)}
-.g-bar i.run{animation:gbar var(--dur,4.6s) linear forwards}
-@keyframes gbar{to{width:100%}}
-@media(max-width:900px){.gallery{margin:0 auto;width:min(380px,92%)}}
+/* Hero photo with SM logo + effects */
+.shot{position:relative;width:min(480px,100%);margin-left:auto;--rx:0deg;--ry:0deg}
+.shot-3d{perspective:1200px}
+.shot-frame{position:relative;aspect-ratio:1;border-radius:30px;padding:2px;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .3s ease-out;transform-style:preserve-3d;box-shadow:0 0 90px -10px rgba(248,184,58,.4),0 40px 70px -30px #000}
+.shot-frame::before{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--a,0deg),transparent 0 55%,rgba(248,184,58,.9) 75%,#fff 80%,transparent 90%),rgba(248,184,58,.18);animation:orbit 4s linear infinite;opacity:0;transition:opacity 1s .8s}
+.shot.go .shot-frame::before{opacity:1}
+@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes orbit{to{--a:360deg}}
+.shot-clip{position:relative;width:100%;height:100%;border-radius:28px;overflow:hidden;background:#000;clip-path:circle(0% at 66% 72%)}
+.shot.go .shot-clip{clip-path:circle(150% at 66% 72%);animation:iris 1.6s cubic-bezier(.5,0,.1,1) both}
+@keyframes iris{from{clip-path:circle(0% at 66% 72%)}to{clip-path:circle(150% at 66% 72%)}}
+.shot-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.35) saturate(.2) blur(6px);transform:scale(1.25)}
+.shot.go .shot-img{animation:develop 2.2s .1s cubic-bezier(.2,.7,.2,1) forwards,kb 14s 2.3s ease-in-out infinite alternate}
+@keyframes develop{to{filter:brightness(1.03) saturate(1.1) blur(0);transform:scale(1.04)}}
+@keyframes kb{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.12) translate(-2.5%,-1.5%)}}
+/* rotating polish reflection on the pad */
+.spin{position:absolute;left:33%;top:60%;width:66%;height:26%;border-radius:50%;overflow:hidden;mix-blend-mode:screen;opacity:0;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent)}
+.spin::before{content:"";position:absolute;inset:-120%;background:conic-gradient(transparent 0 8%,rgba(255,255,255,.42) 12%,transparent 20% 50%,rgba(248,184,58,.4) 58%,transparent 66%);animation:rot .9s linear infinite}
+.shot.go .spin{opacity:1;transition:opacity 1s 1.6s}
+@keyframes rot{to{transform:rotate(360deg)}}
+/* sheen sweep */
+.sheen{position:absolute;inset:-30% auto -30% -60%;width:35%;background:linear-gradient(100deg,transparent,rgba(255,244,214,.38),transparent);transform:skewX(-18deg);opacity:0}
+.shot.go .sheen{animation:sheen 5.5s 2.4s ease-in-out infinite}
+@keyframes sheen{0%{left:-60%;opacity:0}8%{opacity:1}30%{left:130%;opacity:1}31%,100%{left:130%;opacity:0}}
+.dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}
+.vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 50%,rgba(0,0,0,.55)),linear-gradient(180deg,transparent 60%,rgba(8,8,8,.5));pointer-events:none}
+/* logo spark */
+.spark{position:absolute;left:23.6%;top:39.7%;width:0;height:0;pointer-events:none}
+.spark::before,.spark::after{content:"";position:absolute;left:-60px;top:-1px;width:120px;height:2px;background:linear-gradient(90deg,transparent,#fff,transparent);transform:scaleX(0);box-shadow:0 0 14px 2px rgba(255,235,180,.9)}
+.spark::after{transform:scaleX(0) rotate(90deg)}
+.shot.go .spark::before{animation:flare 5.5s 2.2s infinite}
+.shot.go .spark::after{animation:flare2 5.5s 2.2s infinite}
+@keyframes flare{0%,12%{transform:scaleX(0)}16%{transform:scaleX(1)}26%,100%{transform:scaleX(0)}}
+@keyframes flare2{0%,12%{transform:scaleX(0) rotate(90deg)}16%{transform:scaleX(.8) rotate(90deg)}26%,100%{transform:scaleX(0) rotate(90deg)}}
+/* shockwave ring from the pad */
+.ring{position:absolute;left:66%;top:72%;width:20px;height:8px;margin:-4px 0 0 -10px;border:2px solid rgba(248,184,58,.9);border-radius:50%;opacity:0;pointer-events:none;box-shadow:0 0 20px rgba(248,184,58,.7)}
+.shot.go .ring{animation:wave 1.6s cubic-bezier(.3,.6,.2,1) both}
+@keyframes wave{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(40,22)}}
+.shot-cap{display:flex;justify-content:space-between;margin-top:22px;padding:0 6px;font-weight:700;font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.shot-cap span{opacity:0;transform:translateY(10px);transition:.8s}
+.shot.go .shot-cap span{opacity:1;transform:none}
+.shot.go .shot-cap span:nth-child(1){transition-delay:1.6s}.shot.go .shot-cap span:nth-child(2){transition-delay:1.85s;color:#fff}.shot.go .shot-cap span:nth-child(3){transition-delay:2.1s;color:var(--gold)}
+@media(max-width:900px){.shot{margin:0 auto;width:min(400px,92%)}}
