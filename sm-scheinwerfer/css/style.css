@@ -149,9 +149,9 @@ footer .links{display:flex;gap:22px;flex-wrap:wrap}
   .steps{grid-template-columns:1fr 1fr}
   .burger{display:block;order:3}
   .nav .btn.sm{display:none}
-  .menu{position:fixed;inset:0 0 0 30%;background:rgba(10,10,10,.97);backdrop-filter:blur(18px);flex-direction:column;justify-content:center;gap:28px;transform:translateX(100%);transition:.4s;border-left:1px solid var(--line)}
+  .menu{position:fixed;inset:0 0 0 30%;background:rgba(10,10,10,.97);backdrop-filter:blur(18px);flex-direction:column;justify-content:center;gap:28px;opacity:0;visibility:hidden;pointer-events:none;transform:translateX(24px);transition:opacity .35s,transform .35s,visibility .35s;border-left:1px solid var(--line)}
   .menu a{font-size:1.2rem}
-  .menu.open{transform:none}
+  .menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:none}
   .burger.open span:first-child{transform:translateY(4px) rotate(45deg)}
   .burger.open span:last-child{transform:translateY(-4px) rotate(-45deg)}
   .burger{position:relative;z-index:70}
@@ -240,3 +240,6 @@ header{transition:opacity 1s .2s,background .3s,padding .3s}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .btn svg[stroke]{fill:none;stroke:currentColor}
 .btn svg[stroke] circle[fill]{fill:currentColor;stroke:none}
+
+html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
+.wa-float{max-width:62px}

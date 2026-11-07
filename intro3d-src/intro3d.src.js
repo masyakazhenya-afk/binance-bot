@@ -66,7 +66,7 @@ const inside = (x, y) => POLYS.some(poly => {
 
 /* ---------- scene ---------- */
 const scene = new THREE.Scene();
-const FOV = 28;
+const FOV = 16;
 const camera = new THREE.PerspectiveCamera(FOV, cw / ch, 0.1, 60);
 const camDist = (LW / 0.84) / (2 * Math.tan((FOV * Math.PI) / 360) * (cw / ch));
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -264,7 +264,7 @@ star.position.set(...px2w(1240, 40), FRONT + 0.1);
 let done = false, t0 = null, tPrev = 0, px = 0, py = 0, sx = 0, sy = 0;
 const prev = {};
 const stepPath = (k, p) => { const pr = prev[k] || p; prev[k] = p; return [pr, p]; };
-addEventListener("pointermove", e => { px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; });
+addEventListener("pointermove", e => { if (e.pointerType === "touch") return; px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; });
 const spawnSpray = (from, to) => { const s = SP[spNext++ % NSP]; s.from.copy(from); s.to.copy(to); s.a = 0; s.t = rr(0.18, 0.3); s.r = rr(0.02, 0.05); };
 
 function frame(now) {
@@ -383,10 +383,11 @@ function sim(t, dt) {
 function render(t) {
   const fade = easeOut(seg(...S.fade, t));
   logo.position.z = lerp(-2.4, 0, fade); logo.rotation.y = lerp(1.0, 0, fade); logo.scale.setScalar(lerp(0.7, 1, fade));
-  sx += (px - sx) * 0.06; sy += (py - sy) * 0.06;
-  const settle = 1 - ease(seg(0, 1.6, t)), th = -0.55 * settle + sx * 0.34, ph = 0.22 * settle - sy * 0.22 + Math.sin(t * 0.7) * 0.01;
+  const calm = 1 - ease(seg(S.wipe2[0], S.shine[0], t));          // pointer tilt fades out so the final logo is dead straight
+  sx += (px * calm - sx) * 0.06; sy += (py * calm - sy) * 0.06;
+  const settle = 1 - ease(seg(0, 1.6, t)), th = -0.55 * settle + sx * 0.16, ph = 0.22 * settle - sy * 0.1;
   const d = camDist * lerp(1, 0.97, seg(S.shine[0], S.end, t));
-  camera.position.set(Math.sin(th) * d, Math.sin(ph) * d + 0.05, Math.cos(th) * Math.cos(ph) * d); camera.lookAt(0, 0, 0.1);
+  camera.position.set(Math.sin(th) * d, Math.sin(ph) * d, Math.cos(th) * Math.cos(ph) * d); camera.lookAt(0, 0, 0);
   renderer.render(scene, camera);
 }
 
