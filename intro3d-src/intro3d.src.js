@@ -83,43 +83,34 @@ const rim = new THREE.DirectionalLight(0x9fc4ff, 0.9); rim.position.set(-5, 2, -
 scene.add(new THREE.AmbientLight(0xffffff, 0.25));
 const glint = new THREE.PointLight(0xffffff, 0, 14, 1.6); glint.position.set(0, 0, 1.4); scene.add(glint);
 
-/* ---------- 3D letters ---------- */
+/* ---------- the ORIGINAL logo artwork is the base from the very first frame (exact shapes) ---------- */
 const logo = new THREE.Group(); scene.add(logo);
-const DEPTH = 0.42, BEV = 0.06, FRONT = DEPTH / 2 + BEV;
-const letterMats = [
-  new THREE.MeshPhysicalMaterial({ color: 0xd4d8de, metalness: 1, roughness: 0.65, clearcoat: 0.5, clearcoatRoughness: 0.15, envMapIntensity: 1.1 }),
-  new THREE.MeshPhysicalMaterial({ color: 0xd9972a, metalness: 1, roughness: 0.65, clearcoat: 0.5, clearcoatRoughness: 0.15, envMapIntensity: 1.0 })
-];
-const cleanCols = [new THREE.Color(0xd4d8de), new THREE.Color(0xd9972a)];
-const dirtCol = new THREE.Color(0x3a3126);
-
-const shapes = POLYS.map(poly => new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], p[1]))));
-shapes.forEach((sh, i) => {
-  const g = new THREE.ExtrudeGeometry(sh, { depth: DEPTH, bevelEnabled: true, bevelThickness: BEV, bevelSize: 0.045, bevelSegments: 5, curveSegments: 1 });
-  g.translate(0, 0, -DEPTH / 2);
-  const m = new THREE.Mesh(g, letterMats[i]); m.castShadow = true; m.receiveShadow = true; logo.add(m);
-});
-
-/* canvas layers laid over the letter fronts */
+const FRONT = 0.27;                                   // z-level of the logo surface (tools / foam are placed relative to it)
+const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error("img")); im.src = src; });
+const artImg = await loadImg("assets/logo-sm.png");
 const TW = 1024, TH = Math.round(TW * LH / LW);
 const mkLayer = () => { const c = document.createElement("canvas"); c.width = TW; c.height = TH; const x = c.getContext("2d"); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return { c, x, t }; };
-const grime = mkLayer(), haze = mkLayer(), water = mkLayer();
 const w2c = (x, y) => [(x / LW + 0.5) * TW, (0.5 - y / LH) * TH];
 const SC = TW / LW;                                    // px per world unit
-
-function overlayGeo(sh) {
-  const g = new THREE.ShapeGeometry(sh, 4), p = g.attributes.position, uv = g.attributes.uv;
-  for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / LW + 0.5, p.getY(i) / LH + 0.5);
-  return g;
-}
-const overlayMats = {
-  grime: new THREE.MeshStandardMaterial({ map: grime.t, transparent: true, roughness: 0.95, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
-  haze: new THREE.MeshStandardMaterial({ map: haze.t, transparent: true, roughness: 0.6, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }),
-  water: new THREE.MeshPhysicalMaterial({ map: water.t, transparent: true, roughness: 0.05, metalness: 0, clearcoat: 1, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
-};
-[["grime", 0.004], ["haze", 0.008], ["water", 0.012]].forEach(([k, dz]) => {
-  shapes.forEach(sh => { const m = new THREE.Mesh(overlayGeo(sh), overlayMats[k]); m.position.z = FRONT + dz; m.receiveShadow = true; logo.add(m); });
-});
+// mask = logo alpha (as grayscale) -> every overlay only shows where the logo has letters
+const maskTex = (() => {
+  const c = document.createElement("canvas"); c.width = TW; c.height = TH; const g = c.getContext("2d"); g.drawImage(artImg, 0, 0, TW, TH);
+  const d = g.getImageData(0, 0, TW, TH), p = d.data; for (let i = 0; i < p.length; i += 4) { const a = p[i + 3]; p[i] = p[i + 1] = p[i + 2] = a; p[i + 3] = 255; }
+  g.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return t;
+})();
+const artTex = new THREE.Texture(artImg); artTex.colorSpace = THREE.SRGBColorSpace; artTex.anisotropy = 8; artTex.needsUpdate = true;
+const dirtMul = new THREE.Color(0.30, 0.26, 0.2), white = new THREE.Color(1, 1, 1);
+const baseMat = new THREE.MeshBasicMaterial({ map: artTex, transparent: true, toneMapped: false, depthWrite: false, color: dirtMul.clone() });
+const planeGeo = new THREE.PlaneGeometry(LW, LH);
+const addPlane = (mat, dz, extra = {}) => { const m = new THREE.Mesh(planeGeo, mat); m.position.z = FRONT + dz; Object.assign(m, extra); logo.add(m); return m; };
+addPlane(baseMat, 0);
+const grime = mkLayer(), haze = mkLayer(), water = mkLayer(), fx = mkLayer();
+const ov = (L, extra = {}) => new THREE.MeshBasicMaterial({ map: L.t, alphaMap: maskTex, transparent: true, depthWrite: false, toneMapped: false, ...extra });
+addPlane(ov(haze), 0.004); addPlane(ov(grime), 0.008); addPlane(ov(water), 0.012);
+addPlane(ov(fx, { blending: THREE.AdditiveBlending }), 0.02);
+// tools cast soft shadows onto the artwork
+const shadowCatcher = new THREE.Mesh(new THREE.PlaneGeometry(LW + 3, LH + 3), new THREE.ShadowMaterial({ opacity: 0.55, depthWrite: false }));
+shadowCatcher.position.z = FRONT + 0.03; shadowCatcher.receiveShadow = true; logo.add(shadowCatcher);
 
 /* paint grime + haze */
 (function paint() {
@@ -260,15 +251,10 @@ star.position.set(...px2w(1240, 40), FRONT + 0.1);
 
 [sponge, cloth, polisher, bottle].forEach(o => { o.visible = false; scene.add(o); });
 
-/* the REAL logo: the intro ends by dissolving into the original artwork (exact shapes, no re-drawn geometry) */
-const origTex = new THREE.TextureLoader().load("assets/logo-sm.png"); origTex.colorSpace = THREE.SRGBColorSpace; origTex.anisotropy = 8;
-const ORIG_Z = FRONT + 0.06;
-const orig = new THREE.Mesh(new THREE.PlaneGeometry(LW, LH), new THREE.MeshBasicMaterial({ map: origTex, transparent: true, opacity: 0, toneMapped: false, depthWrite: false }));
-orig.position.z = ORIG_Z; orig.scale.setScalar((camDist - ORIG_Z) / camDist); orig.visible = false; scene.add(orig);
-
 /* ---------- animation ---------- */
 let done = false, t0 = null, tPrev = 0, px = 0, py = 0, sx = 0, sy = 0;
 const prev = {};
+let padPos = null;
 const stepPath = (k, p) => { const pr = prev[k] || p; prev[k] = p; return [pr, p]; };
 addEventListener("pointermove", e => { if (e.pointerType === "touch") return; px = e.clientX / innerWidth - 0.5; py = e.clientY / innerHeight - 0.5; });
 const spawnSpray = (from, to) => { const s = SP[spNext++ % NSP]; s.from.copy(from); s.to.copy(to); s.a = 0; s.t = rr(0.18, 0.3); s.r = rr(0.02, 0.05); };
@@ -362,30 +348,29 @@ function sim(t, dt) {
     const [a, b] = stepPath("pd", f(pp)); polisher.visible = true;
     polisher.position.set(b[0], b[1], FRONT + 0.17); polisher.rotation.set(0.05, -0.05, 0); padG.rotation.z += dt * 60;
     stroke(haze, a, b, 1.0 * SC);
-    glint.position.set(b[0] + 0.5, b[1] + 0.45, 1.3); glint.intensity = 14;
+    padPos = b;
   }
-  if (t > S.polish[1] && t < S.shine[0]) glint.intensity = 0;
   // 6. final buff
   if (t >= S.wipe2[0] && t <= S.wipe2[1]) { const [a, b] = clothAt("cl2", pw2, 10, 1.5, 0.15); stroke(haze, a, b, 1.25 * SC); }
   if (t > S.wipe2[1]) clearLayer(haze);
 
   // letters: dirty -> clean tint, roughness -> mirror
   const clean = clamp(seg(S.scrub[0], S.rinse[1], t)), pol = clamp(seg(S.polish[0], S.wipe2[1], t));
-  letterMats.forEach((m, i) => { m.color.lerpColors(dirtCol, cleanCols[i], clean); m.roughness = lerp(0.7, 0.26, ease(pol)); m.clearcoat = lerp(0.1, 0.45, pol); });
+  baseMat.color.lerpColors(dirtMul, white, ease(clean));
 
   updateFoam(dt, bandY);
   if (t > S.rinse[1] + 0.4 && t < S.rinse[1] + 0.5) killFoam();
 
   // 7. shine sweep + star
   const ph = seg(...S.shine, t);
-  if (ph > 0 && ph < 1) { const x = lerp(-HW - 1.2, HW + 1.2, ease(ph)); glint.position.set(x, 0.5, 1.3); glint.intensity = 30 * Math.sin(ph * Math.PI); } else if (t > S.shine[1]) glint.intensity = 0;
+  // additive FX layer: polisher glare + final shine band (masked to the letters)
+  const fxx = fx.x; fxx.clearRect(0, 0, TW, TH);
+  if (padPos && t >= S.polish[0] && t <= S.polish[1] + 0.1) { const [gx, gy] = w2c(padPos[0], padPos[1]), r = 1.1 * SC, g = fxx.createRadialGradient(gx, gy, 0, gx, gy, r); g.addColorStop(0, "rgba(255,250,235,.7)"); g.addColorStop(1, "rgba(255,250,235,0)"); fxx.fillStyle = g; fxx.fillRect(0, 0, TW, TH); }
+  if (ph > 0 && ph < 1) { const bx = w2c(lerp(-HW - 1.4, HW + 1.4, ease(ph)), 0)[0], g = fxx.createLinearGradient(bx - 0.5 * SC, 0, bx + 0.5 * SC, 0); g.addColorStop(0, "rgba(255,246,222,0)"); g.addColorStop(0.5, "rgba(255,246,222,.9)"); g.addColorStop(1, "rgba(255,246,222,0)"); fxx.save(); fxx.setTransform(1, 0, -0.35, 1, 0.35 * TH * 0.5, 0); fxx.fillStyle = g; fxx.fillRect(bx - 1.2 * SC, 0, 2.4 * SC, TH); fxx.restore(); }
+  fx.t.needsUpdate = true;
   const sk = Math.sin(clamp(seg(S.shine[0] + 0.5, S.shine[1] + 0.6, t)) * Math.PI);
   star.visible = sk > 0.01; star.scale.setScalar(1.4 * sk + 0.01); star.material.rotation = t * 0.6;
 
-  const cf = ease(seg(S.shine[0] + 0.25, S.shine[1] + 0.55, t));                 // dissolve 3D metal -> original artwork
-  orig.visible = cf > 0; orig.material.opacity = cf;
-  letterMats.forEach(m => { m.transparent = true; m.opacity = 1 - cf; });
-  logo.children.forEach(c => { if (c.material && c.material.map) c.visible = cf < 1; });
   if (t >= S.text[0] && !txt.classList.contains("show")) txt.classList.add("show");
   if (t >= S.shine[0]) canvas.classList.add("glow");
 }
