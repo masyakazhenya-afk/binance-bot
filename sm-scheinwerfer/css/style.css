@@ -243,3 +243,10 @@ header{transition:opacity 1s .2s,background .3s,padding .3s}
 
 html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
 .wa-float{max-width:62px}
+
+/* Final call-to-action on booking info page */
+.cta-end{text-align:center;padding:70px 0 90px;background:radial-gradient(ellipse at 50% 60%,rgba(248,184,58,.14),transparent 65%)}
+.cta-end .lead{margin:10px auto 30px}
+.btn-xl{padding:20px 38px;font-size:1.15rem;max-width:100%;justify-content:center;text-align:center}
+.cta-end .hint{margin-top:18px}
+@media(max-width:520px){.btn-xl{width:100%;padding:20px 18px;font-size:1.05rem}}
