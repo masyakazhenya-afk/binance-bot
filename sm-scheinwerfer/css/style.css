@@ -165,7 +165,7 @@ footer .links{display:flex;gap:22px;flex-wrap:wrap}
 .hero .wrap{z-index:1}
 
 /* Real photos */
-.brand img{width:auto;height:44px;mix-blend-mode:lighten}
+.brand img{width:auto;height:44px}
 .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1000px;margin-inline:auto}
 .ba-grid .ba{aspect-ratio:1/1;max-width:none}
 .ba img{object-position:var(--pos,50% 50%)}
