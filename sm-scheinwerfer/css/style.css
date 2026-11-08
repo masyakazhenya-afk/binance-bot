@@ -125,13 +125,13 @@ textarea{min-height:110px;resize:vertical}
 .hint{color:var(--muted);font-size:.85rem}
 
 /* Footer */
-footer{border-top:1px solid var(--line);padding:50px 0 100px;color:var(--muted);font-size:.9rem}
+footer{border-top:1px solid var(--line);padding:50px 0 150px;color:var(--muted);font-size:.9rem}
 footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
 footer a:hover{color:var(--gold)}
 footer .links{display:flex;gap:22px;flex-wrap:wrap}
 
 /* Floating WhatsApp */
-.wa-float{position:fixed;right:20px;bottom:20px;z-index:60;width:62px;height:62px;border-radius:50%;background:var(--gold);color:#111;display:grid;place-items:center;box-shadow:0 8px 34px rgba(248,184,58,.6);transition:.25s}
+.wa-float{position:fixed;right:20px;bottom:72px;z-index:60;width:62px;height:62px;border-radius:50%;background:var(--gold);color:#111;display:grid;place-items:center;box-shadow:0 8px 34px rgba(248,184,58,.6);transition:.25s}
 .wa-float::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);animation:ping 2.2s infinite}
 .wa-float:hover{transform:scale(1.1)}
 .wa-float svg{width:30px;height:30px;fill:currentColor}
