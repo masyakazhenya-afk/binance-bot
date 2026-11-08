@@ -35,7 +35,7 @@
   for (let i = 0; i < 46; i++) P.push(spawn(true));
   if (!matchMedia("(prefers-reduced-motion:reduce)").matches) requestAnimationFrame(frameLoop);
 
-  const start = () => s.classList.add("go");
+  const start = () => { s.classList.add("go"); setTimeout(() => s.classList.add("settled"), 2300); };
   if (root.classList.contains("intro-active")) {
     const mo = new MutationObserver(() => { if (!root.classList.contains("intro-active")) { mo.disconnect(); setTimeout(start, 500); } });
     mo.observe(root, { attributes: true, attributeFilter: ["class"] });
